@@ -1,0 +1,154 @@
+﻿@model ProductOrder.Models.Order
+
+@{
+    ViewBag.Title = "Add Order";
+}
+
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Add Order</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.customer_id, "Customer", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select id="customer_id" name="customer_id" class="form-control">
+                    <option value="0">--Select Customer--</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.customer_id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.product_id, "Product", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @*@Html.DropDownList("product_id", null, htmlAttributes: new { @class = "form-control" ,@id="ddlCustomer"})*@
+                <select id="product_id" name="product_id" class="form-control">
+                    <option value="0">--Select Product--</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.product_id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.unit_price, "Unit Price",htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.unit_price, new { htmlAttributes = new { @class = "form-control",@readonly=true,@id= "unit_price" } })
+                @Html.ValidationMessageFor(model => model.unit_price, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.qty,"Quantity", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.qty, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.qty, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.total_price,"Total Price", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.total_price, new { htmlAttributes = new { @class = "form-control",@readonly=true } })
+                @Html.ValidationMessageFor(model => model.total_price, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save Order" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/Masters/GetCustomer",
+            dataType: "json",
+            success: function (response) {
+                if (response.length > 0) {
+                    $.each(response, function (data, value) {
+                        $("#customer_id").append($("<option></option>").val(value.id).html(value.first_name));
+                    });
+                }
+                else
+                    alert(response.data)
+            },
+            error: function (err) {
+                alert(err.error);
+            }
+        });
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/api/Masters/GetProducts",
+            dataType: "json",
+            success: function (response) {
+                if (response.length > 0) {
+                    $.each(response, function (data, value) {
+                        $("#product_id").append($("<option></option>").val(value.id).html(value.name));
+                    });
+                }
+                else
+                    alert(response.data)
+            },
+            error: function (err) {
+                alert(err.error);
+            }
+        });
+
+        $("#product_id").change(function () {
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: "/api/Products/GetPrice/" + $('#product_id').val(),
+                dataType: "json",
+                success: function (response) {
+                    if (response.length > 0) {
+                        $.each(response, function (data, value) {
+                            $("#unit_price").val(value.unit_price);
+                        });
+                        if ($("#total_price").val() != "") {
+                            calculateTotalprice();
+                        }
+                    }
+                    else
+                        alert(response.data)
+                },
+                error: function (err) {
+                    alert(err.error);
+                }
+            });
+            
+        });
+        $("#qty").change(function () {
+            calculateTotalprice();
+          
+        });
+    });
+    function calculateTotalprice() {
+        var total = 0;
+        total = $("#qty").val() * $("#unit_price").val();
+        $("#total_price").val(total);
+    }
+</script>

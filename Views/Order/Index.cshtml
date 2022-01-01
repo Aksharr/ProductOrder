@@ -1,0 +1,68 @@
+﻿@model IEnumerable<ProductOrder.Models.Order>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Add Order", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Customer")
+        </th>
+        <th>
+            @Html.DisplayName("Product")
+        </th>
+        <th>
+            @Html.DisplayName("Qty")
+        </th>
+        <th>
+            @Html.DisplayName("Unit Price")
+        </th>
+        <th>
+            @Html.DisplayName("Total Price")
+        </th>
+        <th>
+            @Html.DisplayName("Created Date")
+        </th>
+        <th>
+            @Html.DisplayName("Updated Date")
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Customer.first_name) @Html.DisplayFor(modelItem =>  item.Customer.last_name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Product.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.qty)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.unit_price)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.total_price)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.created_date)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.updated_date)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.id })
+        </td>
+    </tr>
+}
+
+</table>
